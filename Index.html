@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simulateur de Glace</title>
+    <style>
+      body{
+        display: flex;
+        flex-direction: column;
+        align-content: center;
+        align-items: center;
+      }
+      .cont{
+        display: flex;
+      }
+        .container {
+            position: relative;
+            width: 200px;
+            height: 300px;
+            background-image: url('images/background1.png'); /* Chemin de l'image de fond par défaut */
+            background-size: cover;
+        }
+
+        .image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 150px;
+            width: 150px;
+        }
+        #coneImage{
+          top: 149px
+        }
+        #supplementImage1{
+          top: 0px;
+          height: 80px;
+          width: 80px;
+          left: 50px;
+        }
+        #supplementImage2{
+          top: 15px;
+          left: 10px;
+        }
+        #supplementImage3{
+          top: 15px;
+          left: 12px;
+        }
+    </style>
+   <script>
+      
+    
+      
+    function downloadImage() {
+        var container = document.querySelector('.container');
+        var canvas = document.createElement('canvas');
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+        var context = canvas.getContext('2d');
+
+        var bgImg = new Image();
+        var backgroundUrl = container.style.backgroundImage;
+        var url = backgroundUrl.match(/\((.*?)\)/)[1].replace(/('|")/g, '');
+        bgImg.src = url;
+
+        bgImg.onload = function () {
+            context.drawImage(bgImg, 0, 0, container.offsetWidth, container.offsetHeight);
+
+            var coneImg = document.getElementById('coneImage');
+            var parfumImg = document.getElementById('parfumImage');
+            var supplementImg1 = document.getElementById('supplementImage1');
+            var supplementImg2 = document.getElementById('supplementImage2');
+            var supplementImg3 = document.getElementById('supplementImage3');
+
+            // Dessiner les images avec les bonnes dimensions et positions
+            context.drawImage(coneImg, coneImg.offsetLeft, coneImg.offsetTop, coneImg.offsetWidth, coneImg.offsetHeight);
+            context.drawImage(parfumImg, parfumImg.offsetLeft, parfumImg.offsetTop, parfumImg.offsetWidth, parfumImg.offsetHeight);
+            context.drawImage(supplementImg1, supplementImg1.offsetLeft, supplementImg1.offsetTop, supplementImg1.offsetWidth, supplementImg1.offsetHeight);
+            context.drawImage(supplementImg2, supplementImg2.offsetLeft, supplementImg2.offsetTop, supplementImg2.offsetWidth, supplementImg2.offsetHeight);
+            context.drawImage(supplementImg3, supplementImg3.offsetLeft, supplementImg3.offsetTop, supplementImg3.offsetWidth, supplementImg3.offsetHeight);
+
+            var link = document.createElement('a');
+            link.download = 'glace.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        };
+    }
+
+
+
+    function handleBackground(files) {
+        var container = document.querySelector(".container");
+        var selectedBackground = document.getElementById("selectBackground").value;
+        var background = selectedBackground === "background1" ? "background1.png" : selectedBackground === "background2" ? "background2.png" : "background3.png";
+
+        if (files && files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                container.style.backgroundImage = 'url(' + e.target.result + ')';
+            };
+            reader.readAsDataURL(files[0]);
+        } else {
+            container.style.backgroundImage = "url('images/backgrounds/" + background + "')";
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var options = document.getElementsByName('options[]');
+        for (var i = 0; i < options.length; i++) {
+            var supplementImage = document.getElementById('supplementImage' + (i + 1));
+            supplementImage.style.display = 'none';
+        }
+    });
+    function changeImage() {
+        var cone = document.querySelector('input[name="cone"]:checked').value;
+        var parfum = document.querySelector('input[name="parfum"]:checked').value;
+        var coneImage = document.getElementById('coneImage');
+        var parfumImage = document.getElementById('parfumImage');
+        var options = document.getElementsByName('options[]');
+
+        coneImage.src = cone + '.png';
+        parfumImage.src = parfum + '.png';
+
+        for (var i = 0; i < options.length; i++) {
+            var option = options[i];
+            var supplementImage = document.getElementById('supplementImage' + (i + 1));
+            if (option.checked) {
+                supplementImage.src = option.value + '.png';
+                supplementImage.style.display = 'block';
+            } else {
+                supplementImage.src = '';
+                supplementImage.style.display = 'none';
+            }
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+            var options = document.getElementsByName('options[]');
+            for (var i = 0; i < options.length; i++) {
+                var supplementImage = document.getElementById('supplementImage' + (i + 1));
+                supplementImage.style.display = 'none';
+            }
+            changeBackground(); // Appel de la fonction changeBackground au chargement de la page
+        });
+    function changeBackground() {
+        var selectedBackground = document.getElementById("selectBackground").value;
+        var container = document.querySelector(".container");
+        container.style.backgroundImage = "url('images/" + selectedBackground + ".png')";
+    }
+</script>
+</head>
+<body>
+
+<h2>Simulateur de Glace</h2>
+<div class="cont">
+  <form action="simulation.php" method="post" onchange="changeImage()">
+      Type de cone:<br>
+      <input type="radio" name="cone" value="nature" checked>Cone nature<br>
+      <input type="radio" name="cone" value="chocolat">Cone Chocolat<br>
+      Type de parfum:<br>
+      <input type="radio" name="parfum" value="vanille" checked>Vanille<br>
+      <input type="radio" name="parfum" value="fraise">Fraise<br>
+      <input type="radio" name="parfum" value="chocolat1">Chocolat<br><br>
+      Options:<br>
+      <input type="checkbox" name="options[]" value="chantilly">Chantilly<br><br>
+      <input type="checkbox" name="options[]" value="coulisFraise">Coulis Fraise<br><br>
+      <input type="checkbox" name="options[]" value="coulisChocolat">Coulis Chocolat<br><br>
+      Backgrounds:<br>
+      <select id="selectBackground" onchange="changeBackground()">
+        <option value="background1">Background 1</option>
+        <option value="background2">Background 2</option>
+        <option value="background3">Background 3</option>
+      </select>
+    <br><br>
+    <input type="file" accept="image/*" onchange="handleBackground(this.files)">
+  </form>
+
+  <div class="container" style="background-image: url('images/backgrounds/background1.png')">
+      <img id="coneImage" class="image" src="nature.png" alt="Image de cone">
+      <img id="parfumImage" class="image" src="vanille.png" alt="Image de parfum">
+      <img id="supplementImage1" class="image" src="" alt="Image du supplément 1">
+      <img id="supplementImage2" class="image" src="" alt="Image du supplément 2">
+      <img id="supplementImage3" class="image" src="" alt="Image du supplément 3">
+  </div>
+  
+</div>
+<button id="downloadImageButton" onclick="downloadImage()">Telecharger l'image avec le fond</button>
+</body>
+</html>
